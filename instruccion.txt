@@ -1,0 +1,9 @@
+crear .env con lo siguiente:
+
+NODE_ENV=
+HOST=
+PORT=
+DDBBUSER=
+DDBBPASS=
+DDBBNAME=
+DDBBPORT=
