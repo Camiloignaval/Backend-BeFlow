@@ -13,7 +13,6 @@ const { estructuraReturnGet } = require('../helpers/estructuraReturnGet');
 
 const insertPay = async (req, res) => {
   const datos=req.body
-//  const fechaFormateada=dayjs(datos?.billed_at).format('DD-MM-YYYY')
   try {
     datos.object='payment'
     datos.id=`pmt_${uuidv4()}`
@@ -89,10 +88,12 @@ const updateOne= async (req,res) => {
   // console.log(req.params)
   const d=req.body
   try {
+    // comprobando estructura objeto
     if(d?.id && d?.description && d?.billed_hours && d?.billed_at && d?.billing_currency &&
       d?.billed_amount && d?.needs_exchange && d?.exchange_currency){
         const datosADevolver=await calculosApi(d)
         const response=await updatePayment(Object.values(datosADevolver))
+        // si id enviado existe
         if(response.length>0){
           res.status(200).json({
             message:'payment sucessfully updated'
