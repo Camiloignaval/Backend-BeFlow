@@ -7,7 +7,8 @@ const axios = require('axios');
 const dayjs = require('dayjs');
 const { v4: uuidv4 } = require('uuid');
 
-const { insertPago, selectAll } = require("../database/querys")
+const { insertPago, selectAll, selectOne, deleteId } = require("../database/querys");
+const { estructuraReturnGet } = require('../helpers/estructuraReturnGet');
 
 const insertPay = async (req, res) => {
   const datos=req.body
@@ -35,16 +36,12 @@ const insertPay = async (req, res) => {
     }
   } catch (error) {
     console.log(error.message)
-    res.status(400).json({
-      msg: 'Ha ocurrido un error',
-    })
+    res.status(400).send('Bad request')
   }
 }
 
 const notFound=(req,res) => {
-  res.status(404).json({
-    msg:'Página no encontrada'
-  })
+  res.status(404).send('Not Found')
 }
 
 const getAll= async(req,res) => {
@@ -54,27 +51,54 @@ const getAll= async(req,res) => {
     const response=await selectAll(arrayLimitOffset)
     if(response.length>0){
       // generacion de estructura solicitada
-     const arrayResponder=response.map(({id,object, description,billed_hours,billed_at,billing_currency,billed_amount,
-      need_exchange, exchange_currency,original_amount,currency,exchange_rate,created_at,updated_at})=>(
-       {
-        id,object,description,billed_hours,billed_at,amount:billed_amount,currency,
-        exchange:{
-          original_amount,currency,exchange_rate
-        }, created_at,updated_at
-       }))
+     const arrayResponder=estructuraReturnGet(response)
       res.status(200).send(arrayResponder)
     }else{
       throw new Error('No existen registros')
     }
   } catch (error) {
     console.log(error.message)
-    res.status(404).json({
-      msg: 'Not Found',
-    })
+    res.status(404).send('Not Found')
   }
+}
+const getOne=async (req,res) => {
+  try {
+    const response= await selectOne(Object.values(req.params))
+    if(response.length>0){
+      const arrayDevolver=estructuraReturnGet(response)
+      return res.status(200).send(arrayDevolver[0])
+    }else{
+      throw new Error('No existe id solicitado')
+    }
+  } catch (error) {
+    console.log(error.message)
+    res.status(404).send('Not Found')
+  }
+}
+
+const deleteOne=async (req,res) => {
+  try {
+    const response= await deleteId(Object.values(req.params))
+    if(response.length>0){
+      res.status(200).json({
+        message:'payment sucessfully deleted'
+      })
+    }else{
+      throw new Error('Id no ha sido encontrado')
+    }
+  } catch (error) {
+    console.log(error.message)
+    res.status(400).send('Bad request')
+  }
+}
+const updateOne= async () => {
+  
 }
 module.exports = {
   insertPay,
   notFound,
-  getAll
+  getAll,
+  getOne,
+  deleteOne,
+  updateOne
 }

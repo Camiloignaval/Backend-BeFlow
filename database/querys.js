@@ -39,7 +39,34 @@ const selectAll=async (data) => {
     throw new Error ('Ha ocurrido un error')
   }
 }
+
+const selectOne=async (id) => {
+  const query=`select * from payment p where p.id =$1`
+  
+  try {
+    const res=await pool.query(query,id)
+    return res.rows
+  } catch (error) {
+    console.log(error.message)
+    throw new Error ('Ha ocurrido un error')
+  }
+}
+
+const deleteId=async (id) => {
+  const query=`DELETE FROM payment p
+  WHERE p.id=$1 returning *;
+  `
+  try {
+    const res=await pool.query(query,id)
+    return res.rows
+  } catch (error) {
+    console.log(error.message)
+    throw new Error ('Ha ocurrido un error')
+  }
+}
 module.exports = {
   insertPago,
-  selectAll
+  selectAll,
+  selectOne,
+  deleteId
 }

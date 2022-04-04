@@ -2,7 +2,6 @@ const express = require('express')
 const cors = require('cors')
 const app = express()
 
-
 // lectura y parseo de body
 
 app.use(express.json())
