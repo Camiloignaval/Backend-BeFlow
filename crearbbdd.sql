@@ -2,6 +2,17 @@
 -- PostgreSQL database dump
 --
 
+
+
+
+CREATE TABLE public.contpeticiones (
+    numero integer
+);
+
+
+ALTER TABLE public.contpeticiones OWNER TO postgres;
+
+
 CREATE TABLE public.payment (
     id character varying NOT NULL,
     object character varying NOT NULL,
@@ -19,5 +30,17 @@ CREATE TABLE public.payment (
     updated_at character varying
 );
 
+
+ALTER TABLE public.payment OWNER TO postgres;
+
+--
+-- TOC entry 2795 (class 0 OID 27352)
+-- Dependencies: 197
+-- Data for Name: contpeticiones; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.contpeticiones (numero) FROM stdin;
+0
+\.
 
 
