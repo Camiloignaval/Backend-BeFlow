@@ -7,28 +7,21 @@ const axios = require('axios');
 const dayjs = require('dayjs');
 const { v4: uuidv4 } = require('uuid');
 
-const { insertPago, selectAll, selectOne, deleteId } = require("../database/querys");
+const { insertPago, selectAll, selectOne, deleteId, updatePayment } = require("../database/querys");
+const { calculosApi } = require('../helpers/calculosApi');
 const { estructuraReturnGet } = require('../helpers/estructuraReturnGet');
 
 const insertPay = async (req, res) => {
   const datos=req.body
-  console.log(datos)
- const fechaFormateada=dayjs(datos?.billed_at).format('DD-MM-YYYY')
+//  const fechaFormateada=dayjs(datos?.billed_at).format('DD-MM-YYYY')
   try {
     datos.object='payment'
     datos.id=`pmt_${uuidv4()}`
     if(datos?.need_exchange){
-
-      // console.log(`https://mindicador.cl/api/uf/${dayjs(datos?.billed_at).format('DD-MM-YYYY')}`)
-      const { data }=await axios(`https://mindicador.cl/api/uf/${fechaFormateada}`)
-      const valorCambio=(data?.serie[0]?.valor)
-      datos.exchange_rate=valorCambio
-      datos.currency='clf'
-      const valorConvertidoPesos=(Number(valorCambio)*Number(datos.billed_amount)).toFixed(2)
-      datos.original_amount=valorConvertidoPesos
-      datos.created_at=dayjs().format()
+      const datosADevolver=await calculosApi(datos)
+      console.log(datosADevolver)
       // llamada a base de datos
-      const response = await insertPago(Object.values(datos))
+      await insertPago(Object.values(datosADevolver))
       res.status(201).json({
         msg: 'Payment created',
       })
@@ -91,8 +84,30 @@ const deleteOne=async (req,res) => {
     res.status(400).send('Bad request')
   }
 }
-const updateOne= async () => {
-  
+const updateOne= async (req,res) => {
+  // tomare por suposicion, que el id de parametros y body es el mismo, tomare el del objeto del body
+  // console.log(req.params)
+  const d=req.body
+  try {
+    if(d?.id && d?.description && d?.billed_hours && d?.billed_at && d?.billing_currency &&
+      d?.billed_amount && d?.needs_exchange && d?.exchange_currency){
+        const datosADevolver=await calculosApi(d)
+        const response=await updatePayment(Object.values(datosADevolver))
+        if(response.length>0){
+          res.status(200).json({
+            message:'payment sucessfully updated'
+          })
+        }else{
+          throw new Error('No existe el id enviado')
+        }
+      }else{
+        throw new Error('Estructura objeto no es la correcta')
+      }
+  } catch (error) {
+    console.log(error.message)
+    res.status(400).send('Bad request')
+
+  }
 }
 module.exports = {
   insertPay,

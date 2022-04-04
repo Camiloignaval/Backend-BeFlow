@@ -64,9 +64,24 @@ const deleteId=async (id) => {
     throw new Error ('Ha ocurrido un error')
   }
 }
+
+const updatePayment= async (datos) => {
+  const query=`UPDATE payment
+  SET description=$2, billed_hours=$3, billed_at=$4, billing_currency=$5, billed_amount=$6, need_exchange=$7, exchange_currency=$8, original_amount=$11, currency=$10, exchange_rate=$9, updated_at=$12 where id=$1 returning *;
+  `
+  try {
+    const res=await pool.query(query,datos)
+    return res.rows
+  } catch (error) {
+    console.log(error.message)
+    throw new Error ('Ha ocurrido un error')
+  }
+  
+}
 module.exports = {
   insertPago,
   selectAll,
   selectOne,
-  deleteId
+  deleteId,
+  updatePayment
 }
