@@ -18,7 +18,6 @@ const insertPay = async (req, res) => {
     datos.id=`pmt_${uuidv4()}`
     if(datos?.need_exchange){
       const datosADevolver=await calculosApi(datos)
-      console.log(datosADevolver)
       // llamada a base de datos
       await insertPago(Object.values(datosADevolver))
       res.status(201).json({

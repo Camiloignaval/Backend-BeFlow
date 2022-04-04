@@ -78,10 +78,38 @@ const updatePayment= async (datos) => {
   }
   
 }
+
+// contador peticiones
+const updateContador=async (num) => {
+  const query=`UPDATE contpeticiones
+  SET numero= $1;
+  `
+  try {
+    const res=await pool.query(query,num)
+    return res.rows
+  } catch (error) {
+    console.log(error.message)
+    throw new Error ('Ha ocurrido un error')
+  }
+}
+const getContador=async () => {
+  const query=`select * from contpeticiones;
+  `
+  try {
+    const res=await pool.query(query)
+    return res.rows
+  } catch (error) {
+    console.log(error.message)
+    throw new Error ('Ha ocurrido un error')
+  }
+  
+}
 module.exports = {
   insertPago,
   selectAll,
   selectOne,
   deleteId,
-  updatePayment
+  updatePayment,
+  updateContador,
+  getContador
 }
