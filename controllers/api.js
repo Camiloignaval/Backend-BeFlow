@@ -16,15 +16,12 @@ const insertPay = async (req, res) => {
   try {
     datos.object='payment'
     datos.id=`pmt_${uuidv4()}`
-    if(datos?.need_exchange){
       const datosADevolver=await calculosApi(datos)
       // llamada a base de datos
       await insertPago(Object.values(datosADevolver))
       res.status(201).json({
         msg: 'Payment created',
       })
-      
-    }
   } catch (error) {
     console.log(error.message)
     res.status(400).send('Bad request')
@@ -89,7 +86,7 @@ const updateOne= async (req,res) => {
   try {
     // comprobando estructura objeto
     if(d?.id && d?.description && d?.billed_hours && d?.billed_at && d?.billing_currency &&
-      d?.billed_amount && d?.needs_exchange && d?.exchange_currency){
+      d?.billed_amount && d?.needs_exchange!==undefined && d?.exchange_currency){
         const datosADevolver=await calculosApi(d)
         const response=await updatePayment(Object.values(datosADevolver))
         // si id enviado existe

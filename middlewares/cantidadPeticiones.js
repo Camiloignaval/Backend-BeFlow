@@ -7,14 +7,14 @@ const contadorPeticiones=async (req,res,next) => {
         // si el contador de peticiones llega a 10
         if((numero+1)===10){
             await updateContador([0])
-            throw new Error()
+            return  res.status(429).send('TOO MANY REQUESTS')
         // si no es 10, suma 1 al contador
         }else{
             await updateContador([numero+1])
         }
     } catch (error) {
         console.log(error.message)
-       return  res.status(429).send('TOO MANY REQUESTS')
+       return  res.status(500).send('Internal error')
     }
     next()
 }
